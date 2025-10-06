@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="description" content="Build lasting habits, one day at a time">
+    <title>HabitFlow - Micro Habit Tracker</title>
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiSGFiaXRGbG93Iiwic2hvcnRfbmFtZSI6IkhhYml0RmxvdyIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjZmZmZmZmIiwidGhlbWVfY29sb3IiOiIjNjM2NmYxIiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbCwlM0NzdmclMjB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnJTIwd2lkdGg9JzE5MicgaGVpZ2h0PScxOTInJTNFJTNDcmVjdCUyMGZpbGw9JyUyMzYzNjZmMSclMjB3aWR0aD0nMTkyJyUyMGhlaWdodD0nMTkyJyUyMHJ4PScxMicvJTNFJTNDdGV4dCUyMHg9JzUwJTI1JyUyMHk9JzUwJTI1JyUyMGZvbnQtc2l6ZT0nODAnJTIwZG9taW5hbnQtYmFzZWxpbmU9J21pZGRsZSclMjB0ZXh0LWFuY2hvcj0nbWlkZGxlJyUzRSVGMCU5RiU5QSU4MCUzQy90ZXh0JTNFJTNDL3N2ZyUzRQ==","sizes":"192x192","type":"image/svg+xml"}]}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-gradient-start: #667eea;
+            --bg-gradient-end: #764ba2;
+            --text-primary: #333;
+            --text-secondary: #64748b;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-gradient-start: #1e293b;
+            --bg-gradient-end: #0f172a;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3em;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            background: rgba(255,255,255,0.3);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .quote-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .quote-text {
+            font-size: 1.1em;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        .quote-author {
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        .add-habit {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .add-habit input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1em;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .add-habit input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 1em;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .habit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .habit-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            transition: all 0.3s;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .habit-item.completed {
+            background: #dcfce7;
+        }
+
+        [data-theme="dark"] .habit-item.completed {
+            background: #064e3b;
+        }
+
+        .habit-info {
+            flex: 1;
+        }
+
+        .habit-name {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .habit-streak {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .habit-streak.hot {
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .check-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid var(--border-color);
+            background: var(--card-bg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            transition: all 0.3s;
+        }
+
+        .check-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .check-btn.completed {
+            background: var(--success);
+            border-color: var(--success);
+            animation: pop 0.3s ease;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .delete-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 0.9em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        .chart-container {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 150px;
+            gap: 8px;
+        }
+
+        .bar {
+            flex: 1;
+            background: linear-gradient(to top, var(--accent), #a78bfa);
+            border-radius: 8px 8px 0 0;
+            min-height: 10px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .bar:hover {
+            opacity: 0.8;
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        .limit-warning {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .upgrade-btn {
+            background: var(--warning);
+            margin-top: 10px;
+        }
+
+        .upgrade-btn:hover {
+            background: #d97706;
+        }
+
+        .premium-teaser {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .premium-teaser h3 {
+            margin-bottom: 10px;
+        }
+
+        .premium-features {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .premium-features li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .premium-features li:before {
+            content: "✨";
+            position: absolute;
+            left: 0;
+        }
+
+        .install-prompt {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .install-prompt.show {
+            display: flex;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-buttons button {
+            flex: 1;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .share-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .share-card-title {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .share-card-stat {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .share-card-subtitle {
+            opacity: 0.9;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f59e0b;
+            position: fixed;
+            left: 50%;
+            animation: confetti-fall 3s linear forwards;
+            z-index: 9999;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .onboarding {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .onboarding.show {
+            display: flex;
+        }
+
+        .onboarding-content {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .onboarding-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .onboarding-steps {
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        .onboarding-step {
+            padding: 15px;
+            margin: 10px 0;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+        }
+
+        .notification-prompt {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .notification-prompt.show {
+            display: block;
+        }
+
+        @media (max-width: 640px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙</button>
+            <h1>🚀 HabitFlow</h1>
+            <p>Build lasting habits, one day at a time</p>
+        </div>
+
+        <div class="install-prompt" id="installPrompt">
+            <span>📱 Install HabitFlow for quick access!</span>
+            <button class="btn" onclick="installApp()" style="padding: 8px 16px;">Install</button>
+        </div>
+
+        <div class="card">
+            <div class="tabs">
+                <button class="tab active" onclick="switchView('habits')">My Habits</button>
+                <button class="tab" onclick="switchView('stats')">Stats</button>
+                <button class="tab" onclick="switchView('settings')">Settings</button>
+            </div>
+
+            <div id="habitsView" class="view active">
+                <div class="quote-card" id="quoteCard">
+                    <div class="quote-text" id="quoteText"></div>
+                    <div class="quote-author" id="quoteAuthor"></div>
+                </div>
+
+                <div class="notification-prompt" id="notificationPrompt">
+                    <strong>🔔 Enable Reminders</strong>
+                    <p>Get daily reminders to build your habits!</p>
+                    <button class="btn" onclick="requestNotifications()" style="margin-top: 10px; padding: 8px 16px;">Enable Notifications</button>
+                </div>
+
+                <div id="limitWarning" style="display: none;" class="limit-warning">
+                    <strong>Free Plan:</strong> You've reached the 5 habit limit.
+                    <button class="btn upgrade-btn" onclick="showUpgradeModal()">Upgrade to Premium</button>
+                </div>
+
+                <div class="add-habit">
+                    <input type="text" id="habitInput" placeholder="Add a new habit..." maxlength="50">
+                    <button class="btn" onclick="addHabit()">Add</button>
+                </div>
+
+                <div class="habit-list" id="habitList"></div>
+
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-state-icon">✨</div>
+                    <h3>Start Your Journey</h3>
+                    <p>Add your first micro-habit above!</p>
+                </div>
+            </div>
+
+            <div id="statsView" class="view">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalHabits">0</div>
+                        <div class="stat-label">Total Habits</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="completedToday">0</div>
+                        <div class="stat-label">Completed Today</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="longestStreak">0</div>
+                        <div class="stat-label">Longest Streak</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalCompletions">0</div>
+                        <div class="stat-label">All-Time Completions</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Last 7 Days Activity</div>
+                    <div class="bar-chart" id="weekChart"></div>
+                </div>
+
+                <div class="premium-teaser">
+                    <h3>🎯 Unlock Premium Features</h3>
+                    <ul class="premium-features">
+                        <li>Unlimited habits</li>
+                        <li>Advanced analytics & insights</li>
+                        <li>Cloud backup & sync</li>
+                        <li>Custom themes & colors</li>
+                        <li>Smart AI-powered reminders</li>
+                        <li>Remove all ads</li>
+                    </ul>
+                    <button class="btn" onclick="showUpgradeModal()" style="background: white; color: #d97706;">Upgrade Now - Coming Soon!</button>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn" onclick="showShareModal()">📤 Share Progress</button>
+                    <button class="btn" onclick="exportData()">💾 Export Data</button>
+                </div>
+            </div>
+
+            <div id="settingsView" class="view">
+                <h3 style="margin-bottom: 20px;">Settings</h3>
+                
+                <div style="background: var(--bg-secondary); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                        <span><strong>🔔 Daily Reminders</strong></span>
+                        <input type="checkbox" id="remindersToggle" onchange="toggleReminders()" style="width: 20px; height: 20px;">
+                    </label>
+                    <p style="font-size: 0.9em; color: var(--text-secondary); margin-top: 5px;">Get notified to check in daily</p>
+                </div>
+
+                <div style="background: var(--bg-secondary); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 10px;"><strong>⏰ Reminder Time</strong></label>
+                    <input type="time" id="reminderTime" value="09:00" style="width: 100%; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px; background: var(--card-bg); color: var(--text-primary);">
+                </div>
+
+                <div style="background: var(--bg-secondary); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <button class="btn" onclick="showOnboarding()" style="width: 100%;">📖 View Tutorial</button>
+                </div>
+
+                <div style="background: var(--bg-secondary); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <button class="btn" onclick="clearAllData()" style="width: 100%; background: var(--danger);">🗑️ Clear All Data</button>
+                </div>
+
+                <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
+                    <p>HabitFlow v1.0</p>
+                    <p style="font-size: 0.9em; margin-top: 5px;">Made with ❤️ for building better habits</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onboarding Modal -->
+    <div class="onboarding" id="onboarding">
+        <div class="onboarding-content">
+            <div class="onboarding-icon">👋</div>
+            <h2>Welcome to HabitFlow!</h2>
+            <p style="color: var(--text-secondary); margin: 15px 0;">Build lasting habits with ease</p>
+            
+            <div class="onboarding-steps">
+                <div class="onboarding-step">
+                    <strong>1️⃣ Add Your Habits</strong>
+                    <p style="font-size: 0.9em; color: var(--text-secondary);">Start with small, achievable habits</p>
+                </div>
+                <div class="onboarding-step">
+                    <strong>2️⃣ Check In Daily</strong>
+                    <p style="font-size: 0.9em; color: var(--text-secondary);">Tap the circle when you complete a habit</p>
+                </div>
+                <div class="onboarding-step">
+                    <strong>3️⃣ Build Streaks</strong>
+                    <p style="font-size: 0.9em; color: var(--text-secondary);">Stay consistent and watch your streaks grow!</p>
+                </div>
+            </div>
+
+            <button class="btn" onclick="closeOnboarding()" style="width: 100%; margin-top: 20px;">Get Started! 🚀</button>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Share Your Progress</h3>
+                <button class="modal-close" onclick="closeShareModal()">×</button>
+            </div>
+            <div class="share-card" id="shareCard">
+                <div class="share-card-title">🎉 My Progress</div>
+                <div class="share-card-stat" id="shareStreak">0</div>
+                <div class="share-card-subtitle">Day Streak on HabitFlow!</div>
+                <p style="margin-top: 20px; opacity: 0.9;">Building better habits, one day at a time</p>
+            </div>
+            <button class="btn" onclick="shareProgress()" style="width: 100%;">📱 Share</button>
+            <p style="text-align: center; margin-top: 15px; font-size: 0.9em; color: var(--text-secondary);">Screenshot this card to share on social media!</p>
+        </div>
+    </div>
+
+    <!-- Upgrade Modal -->
+    <div class="modal" id="upgradeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🌟 Upgrade to Premium</h3>
+                <button class="modal-close" onclick="closeUpgradeModal()">×</button>
+            </div>
+            <div style="text-align: center; padding: 20px;">
+                <div style="font-size: 3em; margin-bottom: 20px;">🚀</div>
+                <h2 style="margin-bottom: 15px;">Coming Soon!</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 30px;">Premium features will be available soon. Get notified when we launch!</p>
+                
+                <input type="email" id="emailInput" placeholder="Enter your email" style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 10px; margin-bottom: 15px; background: var(--bg-secondary); color: var(--text-primary);">
+                <button class="btn" onclick="joinWaitlist()" style="width: 100%;">Join Waitlist</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const FREE_HABIT_LIMIT = 5;
+        let habits = JSON.parse(localStorage.getItem('habits')) || [];
+        let deferredPrompt;
+        let dailyStats = JSON.parse(localStorage.getItem('dailyStats')) || {};
+        let settings = JSON.parse(localStorage.getItem('settings')) || {
+            theme: 'light',
+            reminders: false,
+            reminderTime: '09:00'
+        };
+
+        const motivationalQuotes = [
+            { text: "Small habits, big changes", author: "You've got this!" },
+            { text: "Consistency is the key to success", author: "Keep going!" },
+            { text: "Every day is a fresh start", author: "Make it count" },
+            { text: "Progress, not perfection", author: "Stay focused" },
+            { text: "The best time to start was yesterday. The next best time is now.", author: "HabitFlow" },
+            { text: "Success is the sum of small efforts repeated daily", author: "Stay consistent" },
+            { text: "You don't have to be great to start, but you have to start to be great", author: "Begin today" }
+        ];
+
+        // Initialize
+        window.addEventListener('load', () => {
+            loadTheme();
+            renderHabits();
+            updateStats();
+            displayRandomQuote();
+            checkOnboarding();
+            checkNotificationPrompt();
